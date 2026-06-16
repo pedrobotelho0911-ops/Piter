@@ -9,6 +9,24 @@
 
 ---
 
+## 🔴 CORREÇÃO (2026-06-16, pós-checagem de fontes)
+
+Auditoria das fontes reais derrubou parte da v1 deste relatório:
+
+1. **Os scores numéricos (82/76/71) NÃO são defensáveis como medição.** Só 2 dos 5
+   sub-sinais (Trends/demanda + Amazon) tinham fonte; Viral e Ads eram estimativa.
+   Trate como *ranking relativo fraco*, não métrica.
+2. **As margens "3-4x" são SUPOSIÇÃO, não dado.** Custo de atacado não foi verificado —
+   páginas B2B (BigBuy etc.) retornam 403 sem login. Vale para os 3 produtos.
+3. **Contradição no #1 (anti-moustique):** o dispositivo barato/dropshippável é a lâmpada
+   **UV/photocatalyseur (~€27,99 varejo Amazon)** — mas o **tigre não é atraído por UV**.
+   O device que comprova ~85% de redução é o **Biogents BG-Mosquitaire (€139–284), marca
+   consolidada**, não dropship. → O #1 é **mais fraco** do que a v1 sugeria. Reavaliar
+   ranking após verificar custo real e/ou achar device mecânico (não-UV) dropshippável.
+   Fontes: eu.biogents.com, idealo.fr, amazon.fr.
+
+---
+
 ## SEÇÃO A — TOP 3 PRODUTOS RECOMENDADOS
 
 ### Sistema de score (0–100)

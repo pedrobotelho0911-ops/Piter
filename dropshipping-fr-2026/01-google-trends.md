@@ -9,7 +9,9 @@ Use como direção de demanda, não como volume exato.
   ~+1 °C (até +1 °C+ no sudoeste). Cenário quente é o mais provável.
 - Estimativa de **~65% de chance de ≥2 ondas de calor (canicule) major** entre jun-set.
 - Já houve **canicule em maio/2026** (mídia FR cobriu).
-- **Mosquito-tigre (Aedes albopictus) presente em 78 departamentos**, impulsionado pelo calor.
+- **Mosquito-tigre (Aedes albopictus) implantado em 81 departamentos em 2026** (~84% do
+  território metropolitano; o dado "78" é de anos anteriores). 1º caso autóctone de
+  chikungunya no Grand Est em 2025. Fontes: tous-nuisibles.fr, mezendo.com, hamelin.info.
   → Medo de picada + doenças (dengue/chikungunya) é gatilho emocional forte.
 
 > Fontes: meteo-paris.com, letribunaldunet.fr, journaldugeek.com (jun/2026).
