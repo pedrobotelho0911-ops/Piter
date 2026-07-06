@@ -23,6 +23,7 @@ export interface Despesa {
   descricao: string;
   categoria: CategoriaDespesa;
   valor: number;
+  diaVencimento?: number; // dia do mês (1-31) em que a despesa vence/é paga
 }
 
 export interface Divida {

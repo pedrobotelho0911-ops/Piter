@@ -1,16 +1,23 @@
 import { useState } from "react";
 import { useFinanceData } from "./hooks/useFinanceData";
+import { useLembreteVencimento } from "./hooks/useLembreteVencimento";
 import { Dashboard } from "./components/Dashboard";
 import { CadastroScreen } from "./components/CadastroScreen";
+import { ReminderModal } from "./components/ReminderModal";
 
 type Aba = "dashboard" | "cadastro";
 
 export function App() {
   const [aba, setAba] = useState<Aba>("dashboard");
   const finance = useFinanceData();
+  const lembrete = useLembreteVencimento(finance.data.despesas);
 
   return (
     <div className="app-shell">
+      {lembrete.mostrarLembrete && (
+        <ReminderModal despesas={lembrete.despesasVencendoHoje} onClose={lembrete.dispensar} />
+      )}
+
       <header className="app-header">
         <h1>Piter Finanças</h1>
       </header>

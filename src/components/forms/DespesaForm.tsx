@@ -14,12 +14,14 @@ export function DespesaForm({ itens, onAdd, onUpdate, onRemove }: Props) {
   const [descricao, setDescricao] = useState("");
   const [categoria, setCategoria] = useState<CategoriaDespesa>("moradia");
   const [valor, setValor] = useState("");
+  const [diaVencimento, setDiaVencimento] = useState("");
 
   function limpar() {
     setEditId(null);
     setDescricao("");
     setCategoria("moradia");
     setValor("");
+    setDiaVencimento("");
   }
 
   function editar(despesa: Despesa) {
@@ -27,16 +29,31 @@ export function DespesaForm({ itens, onAdd, onUpdate, onRemove }: Props) {
     setDescricao(despesa.descricao);
     setCategoria(despesa.categoria);
     setValor(String(despesa.valor));
+    setDiaVencimento(despesa.diaVencimento ? String(despesa.diaVencimento) : "");
   }
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     const valorNum = Number(valor.replace(",", "."));
     if (!descricao.trim() || Number.isNaN(valorNum)) return;
+    const dia = diaVencimento.trim() ? Number(diaVencimento) : undefined;
+    const diaVencimentoValido =
+      dia !== undefined && Number.isInteger(dia) && dia >= 1 && dia <= 31 ? dia : undefined;
     if (editId) {
-      onUpdate({ id: editId, descricao: descricao.trim(), categoria, valor: valorNum });
+      onUpdate({
+        id: editId,
+        descricao: descricao.trim(),
+        categoria,
+        valor: valorNum,
+        diaVencimento: diaVencimentoValido,
+      });
     } else {
-      onAdd({ descricao: descricao.trim(), categoria, valor: valorNum });
+      onAdd({
+        descricao: descricao.trim(),
+        categoria,
+        valor: valorNum,
+        diaVencimento: diaVencimentoValido,
+      });
     }
     limpar();
   }
@@ -77,6 +94,18 @@ export function DespesaForm({ itens, onAdd, onUpdate, onRemove }: Props) {
             required
           />
         </label>
+        <label>
+          Dia do vencimento (opcional)
+          <input
+            value={diaVencimento}
+            onChange={(e) => setDiaVencimento(e.target.value)}
+            placeholder="Ex: 10"
+            inputMode="numeric"
+            type="number"
+            min={1}
+            max={31}
+          />
+        </label>
         <div className="form-actions">
           <button type="submit" className="btn-primary">
             {editId ? "Salvar alterações" : "Adicionar despesa"}
@@ -96,6 +125,7 @@ export function DespesaForm({ itens, onAdd, onUpdate, onRemove }: Props) {
               <strong>{despesa.descricao}</strong>
               <span>
                 {labelCategoria(despesa.categoria)} · {formatCurrency(despesa.valor)}
+                {despesa.diaVencimento ? ` · vence dia ${despesa.diaVencimento}` : ""}
               </span>
             </div>
             <div className="item-actions">
