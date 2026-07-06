@@ -1,9 +1,9 @@
 import type { FinanceData, StatusFinanceiro } from "../types";
 
 export function formatCurrency(value: number): string {
-  return value.toLocaleString("pt-BR", {
+  return value.toLocaleString("pt-PT", {
     style: "currency",
-    currency: "BRL",
+    currency: "EUR",
     maximumFractionDigits: 2,
   });
 }
