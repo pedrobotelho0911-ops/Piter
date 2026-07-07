@@ -3,15 +3,17 @@ import type { useFinanceData } from "../hooks/useFinanceData";
 import { ContaForm } from "./forms/ContaForm";
 import { ReceitaForm } from "./forms/ReceitaForm";
 import { DespesaForm } from "./forms/DespesaForm";
+import { GastoForm } from "./forms/GastoForm";
 import { DividaForm } from "./forms/DividaForm";
 import { InvestimentoForm } from "./forms/InvestimentoForm";
 
-type Secao = "contas" | "receitas" | "despesas" | "dividas" | "investimentos";
+type Secao = "contas" | "receitas" | "despesas" | "gastos" | "dividas" | "investimentos";
 
 const SECOES: { chave: Secao; label: string }[] = [
   { chave: "contas", label: "Contas" },
   { chave: "receitas", label: "Receitas" },
-  { chave: "despesas", label: "Despesas" },
+  { chave: "despesas", label: "Despesas fixas" },
+  { chave: "gastos", label: "Gastos" },
   { chave: "dividas", label: "Dívidas" },
   { chave: "investimentos", label: "Investimentos" },
 ];
@@ -60,6 +62,14 @@ export function CadastroScreen(props: FinanceApi) {
           onAdd={props.addDespesa}
           onUpdate={props.updateDespesa}
           onRemove={props.removeDespesa}
+        />
+      )}
+      {secao === "gastos" && (
+        <GastoForm
+          itens={props.data.gastos}
+          onAdd={props.addGasto}
+          onUpdate={props.updateGasto}
+          onRemove={props.removeGasto}
         />
       )}
       {secao === "dividas" && (

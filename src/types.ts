@@ -26,6 +26,14 @@ export interface Despesa {
   diaVencimento?: number; // dia do mês (1-31) em que a despesa vence/é paga
 }
 
+export interface Gasto {
+  id: string;
+  descricao: string; // nota: com o que foi esse gasto
+  categoria: CategoriaDespesa;
+  valor: number;
+  data: string; // YYYY-MM-DD
+}
+
 export interface Divida {
   id: string;
   descricao: string;
@@ -49,6 +57,7 @@ export interface FinanceData {
   contas: Conta[];
   receitas: Receita[];
   despesas: Despesa[];
+  gastos: Gasto[];
   dividas: Divida[];
   investimentos: Investimento[];
   historico: HistoricoMensal[];
@@ -58,6 +67,7 @@ export const emptyFinanceData: FinanceData = {
   contas: [],
   receitas: [],
   despesas: [],
+  gastos: [],
   dividas: [],
   investimentos: [],
   historico: [],

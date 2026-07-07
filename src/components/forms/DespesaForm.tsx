@@ -63,7 +63,10 @@ export function DespesaForm({ itens, onAdd, onUpdate, onRemove }: Props) {
 
   return (
     <div className="form-block">
-      <p className="form-intro">Moradia, alimentação, transporte, lazer, dívidas ou outros.</p>
+      <p className="form-intro">
+        Contas fixas que se repetem todo mês: aluguel, internet, assinaturas. Para gastos do
+        dia a dia (almoço, uber, compras), use a aba "Gastos".
+      </p>
       <form onSubmit={handleSubmit} className="stack-form">
         <label>
           Descrição

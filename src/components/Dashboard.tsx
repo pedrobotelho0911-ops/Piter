@@ -14,7 +14,7 @@ import {
 } from "recharts";
 import type { FinanceData, StatusFinanceiro } from "../types";
 import { CATEGORIAS_DESPESA } from "../types";
-import { formatCurrency, monthLabel, type FinanceTotals } from "../utils/finance";
+import { formatCurrency, isDataNoMesAtual, monthLabel, type FinanceTotals } from "../utils/finance";
 import { OceanIllustration } from "./OceanIllustration";
 import { StatusBadge } from "./StatusBadge";
 
@@ -35,12 +35,16 @@ interface DashboardProps {
 }
 
 export function Dashboard({ data, totals, score, status }: DashboardProps) {
+  const gastosDoMes = data.gastos
+    .filter((g) => isDataNoMesAtual(g.data))
+    .sort((a, b) => b.data.localeCompare(a.data));
+
   const despesasPorCategoria = CATEGORIAS_DESPESA.map(({ valor, label }) => ({
     categoria: valor,
     label,
-    total: data.despesas
-      .filter((d) => d.categoria === valor)
-      .reduce((acc, d) => acc + d.valor, 0),
+    total:
+      data.despesas.filter((d) => d.categoria === valor).reduce((acc, d) => acc + d.valor, 0) +
+      gastosDoMes.filter((g) => g.categoria === valor).reduce((acc, g) => acc + g.valor, 0),
   })).filter((c) => c.total > 0);
 
   const historico = data.historico.map((h) => ({
@@ -48,9 +52,10 @@ export function Dashboard({ data, totals, score, status }: DashboardProps) {
     saldo: Math.round(h.saldo * 100) / 100,
   }));
 
+  const totalSaida = totals.totalDespesas + totals.totalGastosMes;
   const comparativo = [
     { nome: "Entrou", valor: totals.totalReceitas, cor: "#22c55e" },
-    { nome: "Saiu", valor: totals.totalDespesas, cor: "#ef4444" },
+    { nome: "Saiu", valor: totalSaida, cor: "#ef4444" },
   ];
 
   return (
@@ -69,7 +74,12 @@ export function Dashboard({ data, totals, score, status }: DashboardProps) {
           >
             {formatCurrency(totals.saldoLiquido)}
           </span>
-          <span className="card-hint">Receitas − despesas − dívidas</span>
+          <span className="card-hint">Receitas − despesas − gastos − dívidas</span>
+        </div>
+        <div className="card">
+          <span className="card-label">Gastos este mês</span>
+          <span className="card-value negativo">{formatCurrency(totals.totalGastosMes)}</span>
+          <span className="card-hint">Soma dos gastos do dia a dia</span>
         </div>
         <div className="card">
           <span className="card-label">Patrimônio</span>
@@ -82,8 +92,8 @@ export function Dashboard({ data, totals, score, status }: DashboardProps) {
 
       <section className="panel">
         <h2>Quanto entrou vs quanto saiu</h2>
-        {totals.totalReceitas === 0 && totals.totalDespesas === 0 ? (
-          <p className="empty-hint">Cadastre receitas e despesas para ver o comparativo.</p>
+        {totals.totalReceitas === 0 && totalSaida === 0 ? (
+          <p className="empty-hint">Cadastre receitas, despesas e gastos para ver o comparativo.</p>
         ) : (
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={comparativo} layout="vertical" margin={{ left: 8, right: 24 }}>
@@ -101,9 +111,10 @@ export function Dashboard({ data, totals, score, status }: DashboardProps) {
       </section>
 
       <section className="panel">
-        <h2>Despesas por categoria</h2>
+        <h2>Para onde vai o dinheiro</h2>
+        <p className="panel-subtitle">Despesas fixas + gastos deste mês, por categoria</p>
         {despesasPorCategoria.length === 0 ? (
-          <p className="empty-hint">Cadastre despesas para ver a distribuição.</p>
+          <p className="empty-hint">Cadastre despesas ou gastos para ver a distribuição.</p>
         ) : (
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
@@ -131,6 +142,25 @@ export function Dashboard({ data, totals, score, status }: DashboardProps) {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="panel">
+        <h2>Gastos recentes</h2>
+        {gastosDoMes.length === 0 ? (
+          <p className="empty-hint">Nenhum gasto lançado este mês ainda.</p>
+        ) : (
+          <ul className="item-list">
+            {gastosDoMes.slice(0, 8).map((g) => (
+              <li key={g.id}>
+                <div>
+                  <strong>{g.descricao}</strong>
+                  <span>{new Date(g.data + "T00:00:00").toLocaleDateString("pt-PT")}</span>
+                </div>
+                <strong>{formatCurrency(g.valor)}</strong>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section className="panel">

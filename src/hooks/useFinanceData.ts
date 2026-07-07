@@ -5,6 +5,7 @@ import {
   type Despesa,
   type Divida,
   type FinanceData,
+  type Gasto,
   type Investimento,
   type Receita,
 } from "../types";
@@ -93,6 +94,19 @@ export function useFinanceData() {
     setData((prev) => ({ ...prev, despesas: prev.despesas.filter((d) => d.id !== id) }));
   }, []);
 
+  const addGasto = useCallback((gasto: Omit<Gasto, "id">) => {
+    setData((prev) => ({ ...prev, gastos: [...prev.gastos, { ...gasto, id: makeId() }] }));
+  }, []);
+  const updateGasto = useCallback((gasto: Gasto) => {
+    setData((prev) => ({
+      ...prev,
+      gastos: prev.gastos.map((g) => (g.id === gasto.id ? gasto : g)),
+    }));
+  }, []);
+  const removeGasto = useCallback((id: string) => {
+    setData((prev) => ({ ...prev, gastos: prev.gastos.filter((g) => g.id !== id) }));
+  }, []);
+
   const addDivida = useCallback((divida: Omit<Divida, "id">) => {
     setData((prev) => ({ ...prev, dividas: [...prev.dividas, { ...divida, id: makeId() }] }));
   }, []);
@@ -141,6 +155,9 @@ export function useFinanceData() {
     addDespesa,
     updateDespesa,
     removeDespesa,
+    addGasto,
+    updateGasto,
+    removeGasto,
     addDivida,
     updateDivida,
     removeDivida,

@@ -12,6 +12,7 @@ export interface FinanceTotals {
   totalContas: number;
   totalReceitas: number;
   totalDespesas: number;
+  totalGastosMes: number;
   totalDividaTotal: number;
   totalDividaPaga: number;
   totalDividaRestante: number;
@@ -24,23 +25,32 @@ export interface FinanceTotals {
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
+export function isDataNoMesAtual(dataISO: string, referencia = new Date()): boolean {
+  return dataISO.slice(0, 7) === currentMonthKey(referencia);
+}
+
 export function computeTotals(data: FinanceData): FinanceTotals {
   const totalContas = sum(data.contas, (c) => c.saldo);
   const totalReceitas = sum(data.receitas, (r) => r.valor);
   const totalDespesas = sum(data.despesas, (d) => d.valor);
+  const totalGastosMes = sum(
+    data.gastos.filter((g) => isDataNoMesAtual(g.data)),
+    (g) => g.valor,
+  );
   const totalDividaTotal = sum(data.dividas, (d) => d.valorTotal);
   const totalDividaPaga = sum(data.dividas, (d) => d.valorPago);
   const totalDividaRestante = Math.max(0, totalDividaTotal - totalDividaPaga);
   const totalInvestimentos = sum(data.investimentos, (i) => i.valor);
 
-  const fluxoMensal = totalReceitas - totalDespesas;
+  const fluxoMensal = totalReceitas - totalDespesas - totalGastosMes;
   const patrimonioLiquido = totalContas + totalInvestimentos - totalDividaRestante;
-  const saldoLiquido = totalReceitas - totalDespesas - totalDividaRestante;
+  const saldoLiquido = totalReceitas - totalDespesas - totalGastosMes - totalDividaRestante;
 
   return {
     totalContas,
     totalReceitas,
     totalDespesas,
+    totalGastosMes,
     totalDividaTotal,
     totalDividaPaga,
     totalDividaRestante,

@@ -198,6 +198,12 @@ button {
   font-size: 0.85rem;
 }
 
+.panel-subtitle {
+  margin: -4px 0 8px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
 .legend {
   list-style: none;
   padding: 0;
