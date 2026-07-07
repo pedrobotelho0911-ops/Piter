@@ -3,6 +3,7 @@ export type CategoriaDespesa =
   | "alimentacao"
   | "transporte"
   | "lazer"
+  | "trabalho"
   | "dividas"
   | "outros";
 
@@ -24,6 +25,7 @@ export interface Despesa {
   categoria: CategoriaDespesa;
   valor: number;
   diaVencimento?: number; // dia do mês (1-31) em que a despesa vence/é paga
+  pagoEm?: string; // YYYY-MM do mês em que foi paga; controla se ainda pesa no saldo
 }
 
 export interface Gasto {
@@ -80,6 +82,7 @@ export const CATEGORIAS_DESPESA: { valor: CategoriaDespesa; label: string }[] = 
   { valor: "alimentacao", label: "Alimentação" },
   { valor: "transporte", label: "Transporte" },
   { valor: "lazer", label: "Lazer" },
+  { valor: "trabalho", label: "Trabalho" },
   { valor: "dividas", label: "Dívidas" },
   { valor: "outros", label: "Outros" },
 ];

@@ -15,7 +15,11 @@ export function App() {
   return (
     <div className="app-shell">
       {lembrete.mostrarLembrete && (
-        <ReminderModal despesas={lembrete.despesasVencendoHoje} onClose={lembrete.dispensar} />
+        <ReminderModal
+          despesas={lembrete.despesasVencendoHoje}
+          onClose={lembrete.dispensar}
+          onTogglePaga={finance.toggleDespesaPaga}
+        />
       )}
 
       <header className="app-header">

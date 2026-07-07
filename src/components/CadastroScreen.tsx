@@ -62,6 +62,7 @@ export function CadastroScreen(props: FinanceApi) {
           onAdd={props.addDespesa}
           onUpdate={props.updateDespesa}
           onRemove={props.removeDespesa}
+          onTogglePaga={props.toggleDespesaPaga}
         />
       )}
       {secao === "gastos" && (

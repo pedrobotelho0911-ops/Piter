@@ -1,15 +1,16 @@
 import { useState, type FormEvent } from "react";
 import { CATEGORIAS_DESPESA, type CategoriaDespesa, type Despesa } from "../../types";
-import { formatCurrency } from "../../utils/finance";
+import { estaDespesaPagaNoMes, formatCurrency } from "../../utils/finance";
 
 interface Props {
   itens: Despesa[];
   onAdd: (despesa: Omit<Despesa, "id">) => void;
   onUpdate: (despesa: Despesa) => void;
   onRemove: (id: string) => void;
+  onTogglePaga: (id: string) => void;
 }
 
-export function DespesaForm({ itens, onAdd, onUpdate, onRemove }: Props) {
+export function DespesaForm({ itens, onAdd, onUpdate, onRemove, onTogglePaga }: Props) {
   const [editId, setEditId] = useState<string | null>(null);
   const [descricao, setDescricao] = useState("");
   const [categoria, setCategoria] = useState<CategoriaDespesa>("moradia");
@@ -122,25 +123,35 @@ export function DespesaForm({ itens, onAdd, onUpdate, onRemove }: Props) {
       </form>
 
       <ul className="item-list">
-        {itens.map((despesa) => (
-          <li key={despesa.id}>
-            <div>
-              <strong>{despesa.descricao}</strong>
-              <span>
-                {labelCategoria(despesa.categoria)} · {formatCurrency(despesa.valor)}
-                {despesa.diaVencimento ? ` · vence dia ${despesa.diaVencimento}` : ""}
-              </span>
-            </div>
-            <div className="item-actions">
-              <button type="button" onClick={() => editar(despesa)} aria-label="Editar">
-                ✎
-              </button>
-              <button type="button" onClick={() => onRemove(despesa.id)} aria-label="Remover">
-                ✕
-              </button>
-            </div>
-          </li>
-        ))}
+        {itens.map((despesa) => {
+          const paga = estaDespesaPagaNoMes(despesa);
+          return (
+            <li key={despesa.id}>
+              <div>
+                <strong>{despesa.descricao}</strong>
+                <span>
+                  {labelCategoria(despesa.categoria)} · {formatCurrency(despesa.valor)}
+                  {despesa.diaVencimento ? ` · vence dia ${despesa.diaVencimento}` : ""}
+                </span>
+              </div>
+              <div className="item-actions">
+                <button
+                  type="button"
+                  className={`chip-toggle ${paga ? "paga" : "pendente"}`}
+                  onClick={() => onTogglePaga(despesa.id)}
+                >
+                  {paga ? "✓ Pago" : "Pendente"}
+                </button>
+                <button type="button" onClick={() => editar(despesa)} aria-label="Editar">
+                  ✎
+                </button>
+                <button type="button" onClick={() => onRemove(despesa.id)} aria-label="Remover">
+                  ✕
+                </button>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

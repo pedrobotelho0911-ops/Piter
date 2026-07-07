@@ -372,6 +372,25 @@ button {
   padding: 4px 8px;
 }
 
+.chip-toggle {
+  border: none;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.chip-toggle.pendente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.chip-toggle.paga {
+  background: #dcfce7;
+  color: #166534;
+}
+
 .step-nav {
   display: flex;
   justify-content: space-between;
@@ -423,10 +442,21 @@ button {
 .reminder-list li {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 10px;
   padding: 10px 12px;
   background: var(--bg);
   border-radius: 10px;
   font-size: 0.9rem;
+}
+
+.reminder-list li > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.reminder-list li .chip-toggle {
+  flex-shrink: 0;
 }
 
 .reminder-total {

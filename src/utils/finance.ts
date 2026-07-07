@@ -1,4 +1,4 @@
-import type { FinanceData, StatusFinanceiro } from "../types";
+import type { Despesa, FinanceData, StatusFinanceiro } from "../types";
 
 export function formatCurrency(value: number): string {
   return value.toLocaleString("pt-PT", {
@@ -12,6 +12,7 @@ export interface FinanceTotals {
   totalContas: number;
   totalReceitas: number;
   totalDespesas: number;
+  totalDespesasPendentes: number;
   totalGastosMes: number;
   totalDividaTotal: number;
   totalDividaPaga: number;
@@ -29,10 +30,19 @@ export function isDataNoMesAtual(dataISO: string, referencia = new Date()): bool
   return dataISO.slice(0, 7) === currentMonthKey(referencia);
 }
 
+/** Uma despesa fixa só conta como "paga" no mês em que foi marcada — no mês seguinte volta a pendente. */
+export function estaDespesaPagaNoMes(despesa: Despesa, referencia = new Date()): boolean {
+  return despesa.pagoEm === currentMonthKey(referencia);
+}
+
 export function computeTotals(data: FinanceData): FinanceTotals {
   const totalContas = sum(data.contas, (c) => c.saldo);
   const totalReceitas = sum(data.receitas, (r) => r.valor);
   const totalDespesas = sum(data.despesas, (d) => d.valor);
+  const totalDespesasPendentes = sum(
+    data.despesas.filter((d) => !estaDespesaPagaNoMes(d)),
+    (d) => d.valor,
+  );
   const totalGastosMes = sum(
     data.gastos.filter((g) => isDataNoMesAtual(g.data)),
     (g) => g.valor,
@@ -42,14 +52,15 @@ export function computeTotals(data: FinanceData): FinanceTotals {
   const totalDividaRestante = Math.max(0, totalDividaTotal - totalDividaPaga);
   const totalInvestimentos = sum(data.investimentos, (i) => i.valor);
 
-  const fluxoMensal = totalReceitas - totalDespesas - totalGastosMes;
+  const fluxoMensal = totalReceitas - totalDespesasPendentes - totalGastosMes;
   const patrimonioLiquido = totalContas + totalInvestimentos - totalDividaRestante;
-  const saldoLiquido = totalReceitas - totalDespesas - totalGastosMes - totalDividaRestante;
+  const saldoLiquido = totalReceitas - totalDespesasPendentes - totalGastosMes - totalDividaRestante;
 
   return {
     totalContas,
     totalReceitas,
     totalDespesas,
+    totalDespesasPendentes,
     totalGastosMes,
     totalDividaTotal,
     totalDividaPaga,

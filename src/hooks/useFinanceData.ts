@@ -9,7 +9,13 @@ import {
   type Investimento,
   type Receita,
 } from "../types";
-import { computeScore, computeStatus, computeTotals, currentMonthKey } from "../utils/finance";
+import {
+  computeScore,
+  computeStatus,
+  computeTotals,
+  currentMonthKey,
+  estaDespesaPagaNoMes,
+} from "../utils/finance";
 
 const STORAGE_KEY = "piter-financas:dados";
 
@@ -93,6 +99,16 @@ export function useFinanceData() {
   const removeDespesa = useCallback((id: string) => {
     setData((prev) => ({ ...prev, despesas: prev.despesas.filter((d) => d.id !== id) }));
   }, []);
+  const toggleDespesaPaga = useCallback((id: string) => {
+    setData((prev) => ({
+      ...prev,
+      despesas: prev.despesas.map((d) =>
+        d.id === id
+          ? { ...d, pagoEm: estaDespesaPagaNoMes(d) ? undefined : currentMonthKey() }
+          : d,
+      ),
+    }));
+  }, []);
 
   const addGasto = useCallback((gasto: Omit<Gasto, "id">) => {
     setData((prev) => ({ ...prev, gastos: [...prev.gastos, { ...gasto, id: makeId() }] }));
@@ -155,6 +171,7 @@ export function useFinanceData() {
     addDespesa,
     updateDespesa,
     removeDespesa,
+    toggleDespesaPaga,
     addGasto,
     updateGasto,
     removeGasto,

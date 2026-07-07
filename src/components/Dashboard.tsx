@@ -23,6 +23,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   alimentacao: "#f97316",
   transporte: "#0ea5e9",
   lazer: "#ec4899",
+  trabalho: "#14b8a6",
   dividas: "#ef4444",
   outros: "#94a3b8",
 };
@@ -74,7 +75,7 @@ export function Dashboard({ data, totals, score, status }: DashboardProps) {
           >
             {formatCurrency(totals.saldoLiquido)}
           </span>
-          <span className="card-hint">Receitas − despesas − gastos − dívidas</span>
+          <span className="card-hint">Receitas − despesas pendentes − gastos − dívidas</span>
         </div>
         <div className="card">
           <span className="card-label">Gastos este mês</span>
