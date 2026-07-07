@@ -17,6 +17,8 @@ export interface Receita {
   id: string;
   descricao: string;
   valor: number;
+  data?: string; // YYYY-MM-DD; se definida, só conta no mês correspondente (renda irregular).
+  // Se vazia, é tratada como renda fixa recorrente e conta todo mês (ex: salário).
 }
 
 export interface Despesa {

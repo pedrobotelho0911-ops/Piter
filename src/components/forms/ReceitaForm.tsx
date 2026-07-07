@@ -13,34 +13,44 @@ export function ReceitaForm({ itens, onAdd, onUpdate, onRemove }: Props) {
   const [editId, setEditId] = useState<string | null>(null);
   const [descricao, setDescricao] = useState("");
   const [valor, setValor] = useState("");
+  const [data, setData] = useState("");
 
   function limpar() {
     setEditId(null);
     setDescricao("");
     setValor("");
+    setData("");
   }
 
   function editar(receita: Receita) {
     setEditId(receita.id);
     setDescricao(receita.descricao);
     setValor(String(receita.valor));
+    setData(receita.data ?? "");
   }
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     const valorNum = Number(valor.replace(",", "."));
     if (!descricao.trim() || Number.isNaN(valorNum)) return;
+    const payload = { descricao: descricao.trim(), valor: valorNum, data: data || undefined };
     if (editId) {
-      onUpdate({ id: editId, descricao: descricao.trim(), valor: valorNum });
+      onUpdate({ id: editId, ...payload });
     } else {
-      onAdd({ descricao: descricao.trim(), valor: valorNum });
+      onAdd(payload);
     }
     limpar();
   }
 
+  const itensOrdenados = [...itens].sort((a, b) => (b.data ?? "").localeCompare(a.data ?? ""));
+
   return (
     <div className="form-block">
-      <p className="form-intro">Salário, freelas, entregas, bicos — tudo que entra por mês.</p>
+      <p className="form-intro">
+        Salário, freelas, entregas, bicos. Se a renda entra em datas e valores diferentes,
+        preencha a data — ela só conta no mês certo. Deixe a data em branco para uma renda fixa
+        que se repete todo mês (como um salário).
+      </p>
       <form onSubmit={handleSubmit} className="stack-form">
         <label>
           Descrição
@@ -52,7 +62,7 @@ export function ReceitaForm({ itens, onAdd, onUpdate, onRemove }: Props) {
           />
         </label>
         <label>
-          Valor mensal
+          Valor
           <input
             value={valor}
             onChange={(e) => setValor(e.target.value)}
@@ -60,6 +70,10 @@ export function ReceitaForm({ itens, onAdd, onUpdate, onRemove }: Props) {
             inputMode="decimal"
             required
           />
+        </label>
+        <label>
+          Data (opcional — deixe em branco se for renda fixa mensal)
+          <input type="date" value={data} onChange={(e) => setData(e.target.value)} />
         </label>
         <div className="form-actions">
           <button type="submit" className="btn-primary">
@@ -74,11 +88,16 @@ export function ReceitaForm({ itens, onAdd, onUpdate, onRemove }: Props) {
       </form>
 
       <ul className="item-list">
-        {itens.map((receita) => (
+        {itensOrdenados.map((receita) => (
           <li key={receita.id}>
             <div>
               <strong>{receita.descricao}</strong>
-              <span>{formatCurrency(receita.valor)}</span>
+              <span>
+                {formatCurrency(receita.valor)}
+                {receita.data
+                  ? ` · ${new Date(receita.data + "T00:00:00").toLocaleDateString("pt-PT")}`
+                  : " · fixa todo mês"}
+              </span>
             </div>
             <div className="item-actions">
               <button type="button" onClick={() => editar(receita)} aria-label="Editar">

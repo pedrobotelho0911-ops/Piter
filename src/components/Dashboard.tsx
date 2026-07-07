@@ -53,7 +53,9 @@ export function Dashboard({ data, totals, score, status }: DashboardProps) {
     saldo: Math.round(h.saldo * 100) / 100,
   }));
 
-  const totalSaida = totals.totalDespesas + totals.totalGastosMes;
+  // Usa exatamente os mesmos números do "Saldo líquido" (despesas vencidas, não todas),
+  // pra "Entrou − Saiu" sempre bater com o saldo mostrado ali em cima.
+  const totalSaida = totals.totalDespesasVencidas + totals.totalGastosMes + totals.totalDividaRestante;
   const comparativo = [
     { nome: "Entrou", valor: totals.totalReceitas, cor: "#22c55e" },
     { nome: "Saiu", valor: totalSaida, cor: "#ef4444" },
@@ -93,6 +95,7 @@ export function Dashboard({ data, totals, score, status }: DashboardProps) {
 
       <section className="panel">
         <h2>Quanto entrou vs quanto saiu</h2>
+        <p className="panel-subtitle">Mesma base do saldo líquido: só despesas já vencidas</p>
         {totals.totalReceitas === 0 && totalSaida === 0 ? (
           <p className="empty-hint">Cadastre receitas, despesas e gastos para ver o comparativo.</p>
         ) : (

@@ -50,7 +50,10 @@ export function statusDespesa(despesa: Despesa, referencia = new Date()): Status
 
 export function computeTotals(data: FinanceData): FinanceTotals {
   const totalContas = sum(data.contas, (c) => c.saldo);
-  const totalReceitas = sum(data.receitas, (r) => r.valor);
+  const totalReceitas = sum(
+    data.receitas.filter((r) => !r.data || isDataNoMesAtual(r.data)),
+    (r) => r.valor,
+  );
   const totalDespesas = sum(data.despesas, (d) => d.valor);
   const totalDespesasVencidas = sum(
     data.despesas.filter((d) => statusDespesa(d) === "vencida"),
