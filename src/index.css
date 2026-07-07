@@ -1,1 +1,39 @@
 @import "tailwindcss";
+
+@theme {
+  --color-fundo: #11111b;
+  --color-superficie: #1e1e2e;
+  --color-card: #262639;
+  --color-borda: #32324a;
+  --color-ciano: #22d3ee;
+  --color-roxo: #a78bfa;
+  --color-azul: #4c7dff;
+  --color-verde: #4ade80;
+  --color-dourado: #facc15;
+  --color-texto: #f2f2f8;
+  --color-texto-fraco: #9c9cb5;
+  --font-sans:
+    ui-rounded, "SF Pro Rounded", "Nunito", "Quicksand", "Segoe UI", system-ui, -apple-system,
+    sans-serif;
+}
+
+html {
+  background-color: var(--color-fundo);
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-texto);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Esconde a barra de rolagem horizontal da grade sem tirar a rolagem. */
+.sem-scrollbar {
+  scrollbar-width: none;
+}
+.sem-scrollbar::-webkit-scrollbar {
+  display: none;
+}

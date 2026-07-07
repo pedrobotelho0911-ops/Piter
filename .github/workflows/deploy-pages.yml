@@ -1,0 +1,46 @@
+# Deploy do Rotina no GitHub Pages.
+#
+# Disparo manual (workflow_dispatch) de propósito: o site do Pages é um só por
+# repositório, então publicar o Rotina substitui o app que estiver no ar.
+# Pra publicar: aba Actions → "Deploy Rotina to GitHub Pages" → Run workflow
+# (escolhendo esta branch). Se quiser deploy automático a cada push, adicione
+# um gatilho `push` com esta branch, como no workflow do Piter Finanças.
+name: Deploy Rotina to GitHub Pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
