@@ -381,12 +381,17 @@ button {
   white-space: nowrap;
 }
 
-.chip-toggle.pendente {
-  background: #fef3c7;
-  color: #92400e;
+.chip-toggle.vencida {
+  background: #fee2e2;
+  color: #991b1b;
 }
 
-.chip-toggle.paga {
+.chip-toggle.aguardando {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.chip-toggle.pago {
   background: #dcfce7;
   color: #166534;
 }

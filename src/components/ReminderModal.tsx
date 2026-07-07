@@ -1,5 +1,5 @@
 import type { Despesa } from "../types";
-import { estaDespesaPagaNoMes, formatCurrency } from "../utils/finance";
+import { formatCurrency, statusDespesa } from "../utils/finance";
 
 interface ReminderModalProps {
   despesas: Despesa[];
@@ -9,7 +9,7 @@ interface ReminderModalProps {
 
 export function ReminderModal({ despesas, onClose, onTogglePaga }: ReminderModalProps) {
   const totalPendente = despesas
-    .filter((d) => !estaDespesaPagaNoMes(d))
+    .filter((d) => statusDespesa(d) !== "pago")
     .reduce((acc, d) => acc + d.valor, 0);
 
   return (
@@ -18,7 +18,7 @@ export function ReminderModal({ despesas, onClose, onTogglePaga }: ReminderModal
         <h2>Contas vencendo hoje</h2>
         <ul className="reminder-list">
           {despesas.map((d) => {
-            const paga = estaDespesaPagaNoMes(d);
+            const paga = statusDespesa(d) === "pago";
             return (
               <li key={d.id}>
                 <div>
@@ -27,7 +27,7 @@ export function ReminderModal({ despesas, onClose, onTogglePaga }: ReminderModal
                 </div>
                 <button
                   type="button"
-                  className={`chip-toggle ${paga ? "paga" : "pendente"}`}
+                  className={`chip-toggle ${paga ? "pago" : "vencida"}`}
                   onClick={() => onTogglePaga(d.id)}
                 >
                   {paga ? "✓ Pago" : "Marcar como pago"}

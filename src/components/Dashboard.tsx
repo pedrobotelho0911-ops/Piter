@@ -75,7 +75,7 @@ export function Dashboard({ data, totals, score, status }: DashboardProps) {
           >
             {formatCurrency(totals.saldoLiquido)}
           </span>
-          <span className="card-hint">Receitas − despesas pendentes − gastos − dívidas</span>
+          <span className="card-hint">Receitas − despesas vencidas − gastos − dívidas</span>
         </div>
         <div className="card">
           <span className="card-label">Gastos este mês</span>

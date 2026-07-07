@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { CATEGORIAS_DESPESA, type CategoriaDespesa, type Despesa } from "../../types";
-import { estaDespesaPagaNoMes, formatCurrency } from "../../utils/finance";
+import { formatCurrency, statusDespesa } from "../../utils/finance";
 
 interface Props {
   itens: Despesa[];
@@ -66,7 +66,9 @@ export function DespesaForm({ itens, onAdd, onUpdate, onRemove, onTogglePaga }: 
     <div className="form-block">
       <p className="form-intro">
         Contas fixas que se repetem todo mês: aluguel, internet, assinaturas. Para gastos do
-        dia a dia (almoço, uber, compras), use a aba "Gastos".
+        dia a dia (almoço, uber, compras), use a aba "Gastos". Antes do dia do vencimento ela
+        só fica registrada, sem afetar o saldo. Depois do vencimento, se ainda não foi paga,
+        passa a "Vencida" e entra como negativo no painel.
       </p>
       <form onSubmit={handleSubmit} className="stack-form">
         <label>
@@ -124,7 +126,9 @@ export function DespesaForm({ itens, onAdd, onUpdate, onRemove, onTogglePaga }: 
 
       <ul className="item-list">
         {itens.map((despesa) => {
-          const paga = estaDespesaPagaNoMes(despesa);
+          const status = statusDespesa(despesa);
+          const chipLabel =
+            status === "pago" ? "✓ Pago" : status === "aguardando" ? "Aguardando" : "Vencida";
           return (
             <li key={despesa.id}>
               <div>
@@ -137,10 +141,10 @@ export function DespesaForm({ itens, onAdd, onUpdate, onRemove, onTogglePaga }: 
               <div className="item-actions">
                 <button
                   type="button"
-                  className={`chip-toggle ${paga ? "paga" : "pendente"}`}
+                  className={`chip-toggle ${status}`}
                   onClick={() => onTogglePaga(despesa.id)}
                 >
-                  {paga ? "✓ Pago" : "Pendente"}
+                  {chipLabel}
                 </button>
                 <button type="button" onClick={() => editar(despesa)} aria-label="Editar">
                   ✎

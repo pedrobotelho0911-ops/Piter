@@ -12,7 +12,7 @@ export interface FinanceTotals {
   totalContas: number;
   totalReceitas: number;
   totalDespesas: number;
-  totalDespesasPendentes: number;
+  totalDespesasVencidas: number;
   totalGastosMes: number;
   totalDividaTotal: number;
   totalDividaPaga: number;
@@ -35,12 +35,25 @@ export function estaDespesaPagaNoMes(despesa: Despesa, referencia = new Date()):
   return despesa.pagoEm === currentMonthKey(referencia);
 }
 
+export type StatusDespesa = "pago" | "aguardando" | "vencida";
+
+/**
+ * "aguardando": ainda não chegou o dia do vencimento, só está registrada (não afeta o saldo).
+ * "vencida": passou o dia (ou não tem dia definido) e ainda não foi paga — essa sim pesa no saldo.
+ * "pago": já foi paga neste mês.
+ */
+export function statusDespesa(despesa: Despesa, referencia = new Date()): StatusDespesa {
+  if (estaDespesaPagaNoMes(despesa, referencia)) return "pago";
+  if (despesa.diaVencimento && referencia.getDate() < despesa.diaVencimento) return "aguardando";
+  return "vencida";
+}
+
 export function computeTotals(data: FinanceData): FinanceTotals {
   const totalContas = sum(data.contas, (c) => c.saldo);
   const totalReceitas = sum(data.receitas, (r) => r.valor);
   const totalDespesas = sum(data.despesas, (d) => d.valor);
-  const totalDespesasPendentes = sum(
-    data.despesas.filter((d) => !estaDespesaPagaNoMes(d)),
+  const totalDespesasVencidas = sum(
+    data.despesas.filter((d) => statusDespesa(d) === "vencida"),
     (d) => d.valor,
   );
   const totalGastosMes = sum(
@@ -52,15 +65,15 @@ export function computeTotals(data: FinanceData): FinanceTotals {
   const totalDividaRestante = Math.max(0, totalDividaTotal - totalDividaPaga);
   const totalInvestimentos = sum(data.investimentos, (i) => i.valor);
 
-  const fluxoMensal = totalReceitas - totalDespesasPendentes - totalGastosMes;
+  const fluxoMensal = totalReceitas - totalDespesasVencidas - totalGastosMes;
   const patrimonioLiquido = totalContas + totalInvestimentos - totalDividaRestante;
-  const saldoLiquido = totalReceitas - totalDespesasPendentes - totalGastosMes - totalDividaRestante;
+  const saldoLiquido = totalReceitas - totalDespesasVencidas - totalGastosMes - totalDividaRestante;
 
   return {
     totalContas,
     totalReceitas,
     totalDespesas,
-    totalDespesasPendentes,
+    totalDespesasVencidas,
     totalGastosMes,
     totalDividaTotal,
     totalDividaPaga,
