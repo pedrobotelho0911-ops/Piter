@@ -8,6 +8,7 @@ import { Modal } from "../components/Modal";
 import { FormularioHabito } from "../components/FormularioHabito";
 import { ValoresExtras } from "../components/ValoresExtras";
 import { ResumoDiario } from "../components/ResumoDiario";
+import { NotaFixa } from "../components/NotaFixa";
 
 export function HojeScreen() {
   const agora = new Date();
@@ -74,6 +75,8 @@ export function HojeScreen() {
           ›
         </button>
       </header>
+
+      <NotaFixa />
 
       {ativos.length === 0 ? (
         <div className="mx-4 mt-8 rounded-3xl border border-borda bg-superficie p-8 text-center">

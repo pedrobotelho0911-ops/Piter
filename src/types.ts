@@ -68,6 +68,7 @@ export interface DadosBackup {
   habitos: Habito[];
   registros_diarios: RegistroDiario[];
   configuracao_geral?: ConfiguracaoGeral;
+  nota_fixa?: string;
 }
 
 export function uid(): string {

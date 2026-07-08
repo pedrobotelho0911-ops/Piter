@@ -14,6 +14,7 @@ const CHAVES = {
   registros: "rotina:registros_diarios",
   geral: "rotina:configuracao_geral",
   backup: "rotina:configuracao_backup",
+  notaFixa: "rotina:nota_fixa",
 } as const;
 
 function ler<T>(chave: string, padrao: T): T {
@@ -83,16 +84,26 @@ export function gravarConfigBackup(config: ConfiguracaoBackup): void {
   gravar(CHAVES.backup, config);
 }
 
+export function lerNotaFixa(): string {
+  return ler<string>(CHAVES.notaFixa, "");
+}
+
+export function gravarNotaFixa(texto: string): void {
+  gravar(CHAVES.notaFixa, texto);
+}
+
 export function montarDadosBackup(
   habitos: Habito[],
   registros: MapaRegistros,
   geral: ConfiguracaoGeral,
+  notaFixa: string,
 ): DadosBackup {
   return {
     versao_schema: VERSAO_SCHEMA,
     habitos,
     registros_diarios: Object.values(registros).sort((a, b) => a.data.localeCompare(b.data)),
     configuracao_geral: geral,
+    nota_fixa: notaFixa,
   };
 }
 

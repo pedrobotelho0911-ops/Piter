@@ -23,10 +23,12 @@ import {
   gravarConfigBackup,
   gravarConfigGeral,
   gravarHabitos,
+  gravarNotaFixa,
   gravarRegistros,
   lerConfigBackup,
   lerConfigGeral,
   lerHabitos,
+  lerNotaFixa,
   lerRegistros,
   montarDadosBackup,
   registrosParaMapa,
@@ -41,6 +43,7 @@ interface ValorApp {
   registros: MapaRegistros;
   geral: ConfiguracaoGeral;
   backup: ConfiguracaoBackup;
+  notaFixa: string;
 
   criarHabito: (nome: string, emoji: string, metaMensal: number) => void;
   editarHabito: (id: string, mudancas: Partial<Omit<Habito, "id">>) => void;
@@ -61,6 +64,7 @@ interface ValorApp {
   definirObservacao: (data: string, texto: string) => void;
 
   atualizarGeral: (mudancas: Partial<ConfiguracaoGeral>) => void;
+  definirNotaFixa: (texto: string) => void;
 
   conectarBackup: (token: string) => Promise<{ id: string; dados: DadosBackup } | null>;
   restaurarDeDados: (token: string, gistId: string, dados: DadosBackup) => void;
@@ -77,10 +81,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [registros, setRegistros] = useState<MapaRegistros>(lerRegistros);
   const [geral, setGeral] = useState<ConfiguracaoGeral>(lerConfigGeral);
   const [backup, setBackup] = useState<ConfiguracaoBackup>(lerConfigBackup);
+  const [notaFixa, setNotaFixa] = useState<string>(lerNotaFixa);
 
   // Refs com o estado mais recente, para o envio adiado (debounce) do backup.
-  const dadosRef = useRef({ habitos, registros, geral });
-  dadosRef.current = { habitos, registros, geral };
+  const dadosRef = useRef({ habitos, registros, geral, notaFixa });
+  dadosRef.current = { habitos, registros, geral, notaFixa };
   const backupRef = useRef(backup);
   backupRef.current = backup;
   const timerSyncRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -89,9 +94,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const executarBackup = useCallback(async () => {
     const config = backupRef.current;
     if (!config.github_token || !config.gist_id) return;
-    const { habitos, registros, geral } = dadosRef.current;
+    const { habitos, registros, geral, notaFixa } = dadosRef.current;
     try {
-      await atualizarGist(config.github_token, config.gist_id, montarDadosBackup(habitos, registros, geral));
+      await atualizarGist(
+        config.github_token,
+        config.gist_id,
+        montarDadosBackup(habitos, registros, geral, notaFixa),
+      );
       setBackup((atual) => ({
         ...atual,
         ultimo_backup: new Date().toISOString(),
@@ -115,6 +124,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => gravarRegistros(registros), [registros]);
   useEffect(() => gravarConfigGeral(geral), [geral]);
   useEffect(() => gravarConfigBackup(backup), [backup]);
+  useEffect(() => gravarNotaFixa(notaFixa), [notaFixa]);
 
   // Qualquer alteração relevante nos dados agenda um backup automático.
   useEffect(() => {
@@ -123,7 +133,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return;
     }
     agendarBackup();
-  }, [habitos, registros, geral, agendarBackup]);
+  }, [habitos, registros, geral, notaFixa, agendarBackup]);
 
   // Voltou a internet? Tenta de novo o que ficou pendente ou com erro.
   useEffect(() => {
@@ -259,6 +269,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setGeral((atual) => ({ ...CONFIG_GERAL_PADRAO, ...atual, ...mudancas }));
   }, []);
 
+  const definirNotaFixa = useCallback((texto: string) => {
+    setNotaFixa(texto);
+  }, []);
+
   // ---- Backup (GitHub Gist) ----
 
   const conectarBackup = useCallback(
@@ -266,8 +280,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const existente = await procurarGistDoApp(token);
       if (existente) return existente; // a decisão (restaurar x manter) fica com a interface
 
-      const { habitos, registros, geral } = dadosRef.current;
-      const gistId = await criarGist(token, montarDadosBackup(habitos, registros, geral));
+      const { habitos, registros, geral, notaFixa } = dadosRef.current;
+      const gistId = await criarGist(token, montarDadosBackup(habitos, registros, geral, notaFixa));
       setBackup({
         github_token: token,
         gist_id: gistId,
@@ -283,6 +297,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setHabitos(dados.habitos);
     setRegistros(registrosParaMapa(dados.registros_diarios));
     if (dados.configuracao_geral) setGeral(dados.configuracao_geral);
+    setNotaFixa(dados.nota_fixa ?? "");
     setBackup({
       github_token: token,
       gist_id: gistId,
@@ -292,8 +307,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const adotarGistSobrescrevendo = useCallback(async (token: string, gistId: string) => {
-    const { habitos, registros, geral } = dadosRef.current;
-    await atualizarGist(token, gistId, montarDadosBackup(habitos, registros, geral));
+    const { habitos, registros, geral, notaFixa } = dadosRef.current;
+    await atualizarGist(token, gistId, montarDadosBackup(habitos, registros, geral, notaFixa));
     setBackup({
       github_token: token,
       gist_id: gistId,
@@ -306,9 +321,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const config = backupRef.current;
     if (!config.github_token || !config.gist_id) return;
     if (timerSyncRef.current) clearTimeout(timerSyncRef.current);
-    const { habitos, registros, geral } = dadosRef.current;
+    const { habitos, registros, geral, notaFixa } = dadosRef.current;
     try {
-      await atualizarGist(config.github_token, config.gist_id, montarDadosBackup(habitos, registros, geral));
+      await atualizarGist(
+        config.github_token,
+        config.gist_id,
+        montarDadosBackup(habitos, registros, geral, notaFixa),
+      );
       setBackup((atual) => ({
         ...atual,
         ultimo_backup: new Date().toISOString(),
@@ -342,6 +361,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       registros,
       geral,
       backup,
+      notaFixa,
       criarHabito,
       editarHabito,
       definirAtivo,
@@ -354,6 +374,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       definirAvaliacao,
       definirObservacao,
       atualizarGeral,
+      definirNotaFixa,
       conectarBackup,
       restaurarDeDados,
       adotarGistSobrescrevendo,
@@ -366,6 +387,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       registros,
       geral,
       backup,
+      notaFixa,
       criarHabito,
       editarHabito,
       definirAtivo,
@@ -378,6 +400,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       definirAvaliacao,
       definirObservacao,
       atualizarGeral,
+      definirNotaFixa,
       conectarBackup,
       restaurarDeDados,
       adotarGistSobrescrevendo,
