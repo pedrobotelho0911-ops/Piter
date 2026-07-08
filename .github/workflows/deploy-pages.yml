@@ -1,9 +1,21 @@
-name: Deploy to GitHub Pages
+# Deploy combinado dos dois apps num único site do GitHub Pages:
+#
+#   pedrobotelho0911-ops.github.io/Piter/         -> Piter Finanças (branch fable-5-finance-app)
+#   pedrobotelho0911-ops.github.io/Piter/rotina/  -> Rotina         (branch rotina-habit-tracker)
+#
+# O GitHub Pages só publica UM site por repositório, então em vez de cada branch
+# fazer deploy sozinha (o que substitui o app que estivesse no ar), este workflow
+# faz checkout dos dois branches, builda os dois e publica juntos, sempre que
+# qualquer um dos dois recebe um push. Mantenha uma cópia idêntica deste arquivo
+# nas duas branches — o GitHub só dispara o gatilho `push` usando a versão do
+# workflow presente na própria branch que recebeu o push.
+name: Deploy Piter apps to GitHub Pages
 
 on:
   push:
     branches:
       - claude/fable-5-finance-app-h0aneo
+      - claude/rotina-habit-tracker-ghrvwj
   workflow_dispatch:
 
 permissions:
@@ -19,17 +31,49 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Piter Finanças
+        uses: actions/checkout@v4
+        with:
+          ref: claude/fable-5-finance-app-h0aneo
+          path: financas
+
+      - name: Checkout Rotina
+        uses: actions/checkout@v4
+        with:
+          ref: claude/rotina-habit-tracker-ghrvwj
+          path: rotina
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
-      - run: npm run build
+          cache-dependency-path: |
+            financas/package-lock.json
+            rotina/package-lock.json
+
+      - name: Build Piter Finanças (raiz)
+        working-directory: financas
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build Rotina (/rotina)
+        working-directory: rotina
+        run: |
+          npm ci
+          npm run build
+
+      - name: Combinar os dois builds num site só
+        run: |
+          mkdir -p site
+          cp -r financas/dist/. site/
+          mkdir -p site/rotina
+          cp -r rotina/dist/. site/rotina/
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: site
 
   deploy:
     needs: build
