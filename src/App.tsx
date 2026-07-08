@@ -1,16 +1,19 @@
 import { useState } from "react";
 import { useFinanceData } from "./hooks/useFinanceData";
 import { useLembreteVencimento } from "./hooks/useLembreteVencimento";
+import { useBackup } from "./hooks/useBackup";
 import { Dashboard } from "./components/Dashboard";
 import { CadastroScreen } from "./components/CadastroScreen";
 import { ReminderModal } from "./components/ReminderModal";
+import { AjustesScreen } from "./components/AjustesScreen";
 
-type Aba = "dashboard" | "cadastro";
+type Aba = "dashboard" | "cadastro" | "ajustes";
 
 export function App() {
   const [aba, setAba] = useState<Aba>("dashboard");
   const finance = useFinanceData();
   const lembrete = useLembreteVencimento(finance.data.despesas);
+  const backup = useBackup(finance.data, finance.substituirDados);
 
   return (
     <div className="app-shell">
@@ -27,16 +30,16 @@ export function App() {
       </header>
 
       <main className="app-content">
-        {aba === "dashboard" ? (
+        {aba === "dashboard" && (
           <Dashboard
             data={finance.data}
             totals={finance.totals}
             score={finance.score}
             status={finance.status}
           />
-        ) : (
-          <CadastroScreen {...finance} />
         )}
+        {aba === "cadastro" && <CadastroScreen {...finance} />}
+        {aba === "ajustes" && <AjustesScreen backup={backup} />}
       </main>
 
       <nav className="bottom-nav">
@@ -53,6 +56,13 @@ export function App() {
         >
           <span className="nav-icon">➕</span>
           Cadastrar
+        </button>
+        <button
+          className={aba === "ajustes" ? "active" : ""}
+          onClick={() => setAba("ajustes")}
+        >
+          <span className="nav-icon">⚙️</span>
+          Ajustes
         </button>
       </nav>
     </div>

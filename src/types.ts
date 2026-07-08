@@ -79,6 +79,20 @@ export const emptyFinanceData: FinanceData = {
 
 export type StatusFinanceiro = "vermelho" | "amarelo" | "verde";
 
+export type StatusBackup = "sincronizado" | "pendente" | "erro" | "nunca_sincronizado";
+
+export interface ConfiguracaoBackup {
+  github_token: string;
+  gist_id: string | null;
+  ultimo_backup: string | null; // ISO datetime
+  status: StatusBackup;
+}
+
+export interface DadosBackup {
+  versao_schema: number;
+  dados: FinanceData;
+}
+
 export const CATEGORIAS_DESPESA: { valor: CategoriaDespesa; label: string }[] = [
   { valor: "moradia", label: "Moradia" },
   { valor: "alimentacao", label: "Alimentação" },

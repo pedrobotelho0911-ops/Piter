@@ -61,6 +61,10 @@ export function useFinanceData() {
     });
   }, [totals.patrimonioLiquido]);
 
+  const substituirDados = useCallback((novosDados: FinanceData) => {
+    setData(novosDados);
+  }, []);
+
   const addConta = useCallback((conta: Omit<Conta, "id">) => {
     setData((prev) => ({ ...prev, contas: [...prev.contas, { ...conta, id: makeId() }] }));
   }, []);
@@ -162,6 +166,7 @@ export function useFinanceData() {
     totals,
     score,
     status,
+    substituirDados,
     addConta,
     updateConta,
     removeConta,

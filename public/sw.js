@@ -16,6 +16,11 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
+  // Nunca cachear chamadas de API de terceiros (ex: backup no GitHub) — elas
+  // precisam sempre ir para a rede, senão o app passa a responder com dados
+  // antigos em cache em vez de checar o estado real remoto.
+  if (new URL(event.request.url).origin !== self.location.origin) return;
+
   const isNavigation =
     event.request.mode === "navigate" || event.request.destination === "document";
 
