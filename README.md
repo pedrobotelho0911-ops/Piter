@@ -32,18 +32,25 @@ O localStorage é a fonte da verdade; o Gist é só cópia de segurança:
 npm install
 npm run dev      # desenvolvimento
 npm run build    # typecheck + build de produção em dist/
-npm run preview  # serve o build (em /Piter/)
+npm run preview  # serve o build (em /Piter/rotina/)
 npm run lint     # eslint
 npm run icons    # regenera os ícones PNG do PWA (scripts/generate-icons.mjs)
 ```
 
 ## Deploy
 
-O workflow `deploy-pages.yml` publica no GitHub Pages (base `/Piter/`), mas **só com disparo
-manual** (Actions → "Deploy Rotina to GitHub Pages" → Run workflow), porque o Pages é um só por
-repositório e publicar o Rotina substitui o app que estiver no ar (hoje, o Piter Finanças da
-branch `claude/fable-5-finance-app-h0aneo`). Pra automatizar, basta adicionar um gatilho `push`
-no workflow.
+O GitHub Pages publica um site só por repositório, então o Rotina convive com o Piter Finanças
+no mesmo domínio, em pastas diferentes:
+
+- `pedrobotelho0911-ops.github.io/Piter/` → Piter Finanças
+- `pedrobotelho0911-ops.github.io/Piter/rotina/` → Rotina (base `/Piter/rotina/` no `vite.config.ts`)
+
+O workflow `deploy-pages.yml` faz checkout dos dois branches, builda os dois apps e publica
+os dois juntos — dispara automaticamente a cada push em qualquer um dos dois branches, ou
+manualmente (Actions → "Deploy Piter apps to GitHub Pages" → Run workflow). Ele existe como uma
+cópia idêntica nas duas branches (o GitHub só dispara o gatilho `push` usando a versão do
+workflow presente na branch que recebeu o push) — ao editar o workflow, replique a mudança na
+outra branch também.
 
 ## Estrutura
 
