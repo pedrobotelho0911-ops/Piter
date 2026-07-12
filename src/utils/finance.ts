@@ -18,6 +18,7 @@ export interface FinanceTotals {
   totalDividaPaga: number;
   totalDividaRestante: number;
   totalInvestimentos: number;
+  totalReservas: number;
   fluxoMensal: number;
   patrimonioLiquido: number;
   saldoLiquido: number;
@@ -67,10 +68,15 @@ export function computeTotals(data: FinanceData): FinanceTotals {
   const totalDividaPaga = sum(data.dividas, (d) => d.valorPago);
   const totalDividaRestante = Math.max(0, totalDividaTotal - totalDividaPaga);
   const totalInvestimentos = sum(data.investimentos, (i) => i.valor);
+  const totalReservas = totalContas + totalInvestimentos;
 
+  // O saldo do dia a dia não inclui a dívida — ela é mostrada separada (card próprio),
+  // pois é algo pago aos poucos, não algo que deveria "sumir" o saldo atual de uma vez.
   const fluxoMensal = totalReceitas - totalDespesasVencidas - totalGastosMes;
-  const patrimonioLiquido = totalContas + totalInvestimentos - totalDividaRestante;
-  const saldoLiquido = totalReceitas - totalDespesasVencidas - totalGastosMes - totalDividaRestante;
+  const saldoLiquido = fluxoMensal;
+  // Continua calculado (usado no score e na evolução histórica), mesmo sem aparecer
+  // como o número principal do painel.
+  const patrimonioLiquido = totalReservas - totalDividaRestante;
 
   return {
     totalContas,
@@ -82,6 +88,7 @@ export function computeTotals(data: FinanceData): FinanceTotals {
     totalDividaPaga,
     totalDividaRestante,
     totalInvestimentos,
+    totalReservas,
     fluxoMensal,
     patrimonioLiquido,
     saldoLiquido,

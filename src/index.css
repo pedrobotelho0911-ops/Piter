@@ -181,6 +181,15 @@ button {
   color: var(--text-muted);
 }
 
+.card-divida {
+  background: #fee2e2;
+}
+
+.card-divida .card-label,
+.card-divida .card-hint {
+  color: #991b1b;
+}
+
 .panel {
   background: var(--surface);
   border-radius: var(--radius);

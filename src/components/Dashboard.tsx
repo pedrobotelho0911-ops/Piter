@@ -53,9 +53,9 @@ export function Dashboard({ data, totals, score, status }: DashboardProps) {
     saldo: Math.round(h.saldo * 100) / 100,
   }));
 
-  // Usa exatamente os mesmos números do "Saldo líquido" (despesas vencidas, não todas),
-  // pra "Entrou − Saiu" sempre bater com o saldo mostrado ali em cima.
-  const totalSaida = totals.totalDespesasVencidas + totals.totalGastosMes + totals.totalDividaRestante;
+  // Usa exatamente os mesmos números do "Saldo líquido" (despesas vencidas, não todas, e sem
+  // a dívida — ela é mostrada separada), pra "Entrou − Saiu" sempre bater com o saldo ali em cima.
+  const totalSaida = totals.totalDespesasVencidas + totals.totalGastosMes;
   const comparativo = [
     { nome: "Entrou", valor: totals.totalReceitas, cor: "#22c55e" },
     { nome: "Saiu", valor: totalSaida, cor: "#ef4444" },
@@ -77,19 +77,32 @@ export function Dashboard({ data, totals, score, status }: DashboardProps) {
           >
             {formatCurrency(totals.saldoLiquido)}
           </span>
-          <span className="card-hint">Receitas − despesas vencidas − gastos − dívidas</span>
+          <span className="card-hint">Receitas − despesas vencidas − gastos</span>
+        </div>
+        <div className="card">
+          <span className="card-label">Em contas e investimentos</span>
+          <span className={totals.totalReservas < 0 ? "card-value negativo" : "card-value positivo"}>
+            {formatCurrency(totals.totalReservas)}
+          </span>
+          <span className="card-hint">O que você tem agora, sem a dívida</span>
+        </div>
+        <div className={`card ${totals.totalDividaRestante > 0 ? "card-divida" : ""}`}>
+          <span className="card-label">Dívida pendente</span>
+          <span
+            className={totals.totalDividaRestante > 0 ? "card-value negativo" : "card-value positivo"}
+          >
+            {formatCurrency(totals.totalDividaRestante)}
+          </span>
+          <span className="card-hint">
+            {totals.totalDividaRestante > 0
+              ? "À parte do seu saldo do dia a dia — vá abatendo aos poucos"
+              : "Nenhuma dívida em aberto"}
+          </span>
         </div>
         <div className="card">
           <span className="card-label">Gastos este mês</span>
           <span className="card-value negativo">{formatCurrency(totals.totalGastosMes)}</span>
           <span className="card-hint">Soma dos gastos do dia a dia</span>
-        </div>
-        <div className="card">
-          <span className="card-label">Patrimônio</span>
-          <span className={totals.patrimonioLiquido < 0 ? "card-value negativo" : "card-value positivo"}>
-            {formatCurrency(totals.patrimonioLiquido)}
-          </span>
-          <span className="card-hint">Contas + investimentos − dívidas</span>
         </div>
       </div>
 
