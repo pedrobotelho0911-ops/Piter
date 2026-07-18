@@ -56,8 +56,15 @@ export function computeTotals(data: FinanceData): FinanceTotals {
     (r) => r.valor,
   );
   const totalDespesas = sum(data.despesas, (d) => d.valor);
+  // Despesas de categoria "dívidas" nunca entram no saldo do dia a dia (nem pendentes,
+  // nem pagas) — elas são dívida, então só contam pro card isolado "Dívida pendente",
+  // igual às dívidas cadastradas na aba própria.
   const totalDespesasVencidas = sum(
-    data.despesas.filter((d) => statusDespesa(d) === "vencida"),
+    data.despesas.filter((d) => d.categoria !== "dividas" && statusDespesa(d) === "vencida"),
+    (d) => d.valor,
+  );
+  const totalDespesaDividaPendente = sum(
+    data.despesas.filter((d) => d.categoria === "dividas" && statusDespesa(d) !== "pago"),
     (d) => d.valor,
   );
   const totalGastosMes = sum(
@@ -66,7 +73,8 @@ export function computeTotals(data: FinanceData): FinanceTotals {
   );
   const totalDividaTotal = sum(data.dividas, (d) => d.valorTotal);
   const totalDividaPaga = sum(data.dividas, (d) => d.valorPago);
-  const totalDividaRestante = Math.max(0, totalDividaTotal - totalDividaPaga);
+  const totalDividaRestante =
+    Math.max(0, totalDividaTotal - totalDividaPaga) + totalDespesaDividaPendente;
   const totalInvestimentos = sum(data.investimentos, (i) => i.valor);
   const totalReservas = totalContas + totalInvestimentos;
 

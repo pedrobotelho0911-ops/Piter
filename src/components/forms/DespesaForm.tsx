@@ -90,6 +90,12 @@ export function DespesaForm({ itens, onAdd, onUpdate, onRemove, onTogglePaga }: 
             ))}
           </select>
         </label>
+        {categoria === "dividas" && (
+          <p className="form-intro">
+            Essa despesa não entra no "Saldo líquido" — ela soma direto no card separado
+            "Dívida pendente", e sai de lá quando marcar como paga.
+          </p>
+        )}
         <label>
           Valor mensal
           <input
